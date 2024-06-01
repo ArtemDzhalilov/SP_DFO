@@ -4,8 +4,9 @@ import mne
 import os
 import tempfile
 from ml import pipeline
-
-
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 # Preprocessing file
 def file_ppc(f):
     pattern = r'(\d+\.\d+\.\d+):(\d+):(\d+)'
@@ -29,7 +30,16 @@ with st.sidebar:
     if uploaded_file is not None:
         raw = file_ppc(uploaded_file)
 
-        #Твоя функция
         ans, dots, prediction = pipeline(raw)
+        dots = dots[0]
+        print(dots[0][0], dots[1][0], dots[2][0], dots[3][0], dots[4][0], dots[5][0])
+        for s in range(len(dots)):
+            plt.plot(dots[s])
+            plt.title('График сигнала')
+            plt.xlabel('Время, сек')
+            plt.ylabel('ЭЭГ')
+            #plt.show()
+            plt.savefig(f'channel{s}.png')
+
 ans=''
 st.text(ans)
