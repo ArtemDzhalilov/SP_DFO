@@ -76,14 +76,11 @@ def read_data_for_inference(datax):
             skip_channels.append(channel)
     epochs=mne.make_fixed_length_epochs(datax,duration=150 ,overlap=0)
     epochs=epochs.get_data(picks=pick_array)
-    print(epochs.shape)
     n_inserted = 0
     for s in skip_channels:
         new_channel = np.zeros((1, 30000))
-        print(new_channel.shape)
         epochs = np.insert(epochs, s+n_inserted, new_channel, axis=1)
         n_inserted += 1
-    print(epochs.shape)
     return epochs.astype(np.float32)
 
 def predict(data):
@@ -92,9 +89,9 @@ def predict(data):
     emb = emb.cpu().detach().numpy().squeeze()
     classes = torch.argmax(out, dim=1)
     arr = out.cpu().detach().numpy()
-    flat_ind = np.argpartition(arr.flatten(), -5)[-5:]
-    inds = np.unravel_index(flat_ind, arr.shape)
-    return classes, emb, inds
+    max_values = np.max(arr, axis=1)
+    top_indices = np.argsort(max_values)[-1:]
+    return classes, emb, top_indices
 
 def predict_catboost(emb):
     return cat.predict(emb).mean()
