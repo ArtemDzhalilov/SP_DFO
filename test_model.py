@@ -130,7 +130,7 @@ def read_data(path):
 paths = []
 
 if len(paths) == 0:
-    raise Exception("Заполните переменную paths своими значниями (используйте глобальные пути и и указыввайте название то Nr файла. Пример - C:/Users/User/Downloads/sample/Np 18/Nr 1/)")
+    raise Exception("Fill the variable paths with your values (use absolute paths and specify the file name. Example - C:/Users/User/Downloads/sample/Np 18/Nr 1/).")
 data = []
 
 for s in paths:
