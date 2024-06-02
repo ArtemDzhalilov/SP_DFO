@@ -1,6 +1,8 @@
 import random
 
 import numpy as np
+from pathlib import Path
+
 from model import Chrononet
 import torch
 import os
@@ -10,13 +12,10 @@ import mne
 
 model = Chrononet()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model.load_state_dict(torch.load('best_model_masked.pth'))
+model.load_state_dict(torch.load('best_model.pth'))
 model.eval()
 model.to(device)
-model_unmasked = Chrononet()
-model_unmasked.load_state_dict(torch.load('best_model_without_mask.pth'))
-model_unmasked.eval()
-model_unmasked.to(device)
+
 
 arr = []
 
@@ -96,7 +95,22 @@ class DatasetWithoutMasks(torch.utils.data.Dataset):
 
         return sequence_tensor, label_tensor
 
+def execute(path):
 
+    files = os.listdir(path)
+    #print(files)
+    paths1 = [os.path.join(path, f) for f in files if f.endswith(".REC") or f.endswith(".rec")]
+    if len(paths1)==0:
+        return 0
+    old_filename = Path(paths1[0])
+
+    new_extension = '.EDF'
+
+    new_filename = old_filename.with_suffix(new_extension)
+    try:
+        old_filename.rename(new_filename)
+    except:
+        pass
 
 def read_data(path):
     match = re.search(r'\d+', path)
@@ -113,11 +127,14 @@ def read_data(path):
             return [epochs.astype(np.float32), 0]
         else:
             return [epochs.astype(np.float32), 1]
-paths = ['C:/Users/User/Downloads/sample/Np 18/Nr 1/', 'C:/Users/User/Downloads/sample/Np 18/Nr 2/', 'C:/Users/User/Downloads/sample/Np 1/Nr 1/', 'C:/Users/User/Downloads/sample/Np 1/Nr 2/']
+paths = []
 
+if len(paths) == 0:
+    raise Exception("Заполните переменную paths своими значниями (используйте глобальные пути и и указыввайте название то Nr файла. Пример - C:/Users/User/Downloads/sample/Np 18/Nr 1/)")
 data = []
 
 for s in paths:
+    execute(s)
     data.append(read_data(s))
 
 
